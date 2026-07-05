@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Forge — Describe it. Watch it get built.</title>
+<meta name="description" content="Describe the app you want in plain English. Forge builds it live and deploys it to your own gallery." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1180px; margin: 0 auto; padding: 1.4rem 1.5rem;
+  }
+  .brand { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; }
+  .brand-mark {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--ink); position: relative; flex-shrink: 0;
+  }
+  .brand-mark::after {
+    content: ""; position: absolute; inset: 8px;
+    background: var(--ember); clip-path: polygon(0 100%, 100% 100%, 50% 0);
+  }
+
+  .hero {
+    max-width: 1180px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem;
+    display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 3.5rem; align-items: center;
+  }
+  .hero h1 {
+    font-size: clamp(2.3rem, 4.4vw, 3.4rem);
+    line-height: 1.06;
+    margin: 1rem 0 1.2rem;
+  }
+  .hero h1 em { font-style: normal; color: var(--ember); }
+  .hero p.lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 46ch; margin-bottom: 1.8rem; }
+  .hero-stats { display: flex; gap: 2rem; margin-top: 2.2rem; }
+  .hero-stats div strong { display: block; font-family: var(--font-display); font-size: 1.4rem; }
+  .hero-stats div span { font-size: 0.78rem; color: var(--muted); font-family: var(--font-mono); }
+
+  .mock {
+    padding: 1.1rem;
+  }
+  .mock-bar { display: flex; gap: 6px; padding: 0 0.2rem 0.9rem; }
+  .mock-bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); display: block; }
+  .mock-log {
+    font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-soft);
+    background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 0.9rem 1rem; height: 168px; overflow: hidden;
+  }
+  .mock-log div { opacity: 0; animation: appear 0.4s ease forwards; margin-bottom: 0.4rem; }
+  .mock-log div:nth-child(1){animation-delay:.2s}
+  .mock-log div:nth-child(2){animation-delay:.9s}
+  .mock-log div:nth-child(3){animation-delay:1.6s}
+  .mock-log div:nth-child(4){animation-delay:2.3s;color:var(--ok);}
+  .mock-log .caret { display:inline-block; width:7px; height:1em; background:var(--ember); vertical-align:middle; animation: blink 1s step-end infinite; margin-left:2px;}
+  @keyframes appear { to { opacity: 1; } }
+  @keyframes blink { 50% { opacity: 0; } }
+  .mock-preview {
+    margin-top: 0.9rem; border-radius: var(--radius-sm); border: 1px solid var(--line);
+    background: linear-gradient(135deg, var(--teal-tint), var(--paper-raised) 60%);
+    height: 120px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted);
+  }
+
+  .auth-wrap {
+    max-width: 420px; margin: 0 auto 5rem; padding: 0 1.5rem;
+  }
+  .auth-card { padding: 2rem; }
+  .auth-tabs { display: flex; gap: 0.4rem; margin-bottom: 1.5rem; background: var(--paper); border-radius: var(--radius-sm); padding: 4px; }
+  .auth-tab {
+    flex: 1; text-align: center; padding: 0.55rem; border-radius: 5px; font-weight: 600;
+    font-size: 0.88rem; color: var(--muted); background: transparent; border: none;
+  }
+  .auth-tab.active { background: var(--paper-raised); color: var(--ink); box-shadow: var(--shadow-sm); }
+  .auth-panel { display: none; }
+  .auth-panel.active { display: block; }
+  .auth-msg { font-family: var(--font-mono); font-size: 0.82rem; margin-top: 0.8rem; min-height: 1.2em; color: var(--danger); }
+
+  .section-strip {
+    max-width: 1180px; margin: 0 auto; padding: 0 1.5rem 5rem;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem;
+  }
+  .strip-item { padding: 1.4rem; }
+  .strip-item .eyebrow { margin-bottom: 0.6rem; }
+  .strip-item h3 { font-size: 1.05rem; margin-bottom: 0.4rem; }
+  .strip-item p { color: var(--ink-soft); font-size: 0.92rem; margin: 0; }
+
+  footer { text-align: center; padding: 2rem 1.5rem; color: var(--muted); font-size: 0.82rem; }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding-bottom: 3rem; }
+    .section-strip { grid-template-columns: 1fr; }
+    .hero-stats { flex-wrap: wrap; row-gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="brand-mark"></span> Forge</div>
+  <a href="#auth" class="btn btn-ghost btn-sm">Sign in</a>
+</div>
+
+<section class="hero">
+  <div>
+    <span class="eyebrow">Prompt → live app</span>
+    <h1>Describe it in<br/>plain English.<br/><em>Watch it get built.</em></h1>
+    <p class="lede">Forge turns a sentence into a working website: type what you want, get a live preview in seconds, then save it to your own gallery or take the file with you.</p>
+    <a href="#auth" class="btn btn-primary">Start building — it's free</a>
+    <div class="hero-stats">
+      <div><strong>&lt; 20s</strong><span>TYPICAL BUILD TIME</span></div>
+      <div><strong>1 file</strong><span>PORTABLE HTML OUTPUT</span></div>
+      <div><strong>0</strong><span>SETUP REQUIRED</span></div>
+    </div>
+  </div>
+
+  <div class="blueprint-frame mock" data-label="build log — live">
+    <div class="mock-bar"><i></i><i></i><i></i></div>
+    <div class="mock-log">
+      <div>&gt; reading prompt: "a habit tracker with streaks"</div>
+      <div>&gt; laying out structure… done</div>
+      <div>&gt; writing styles + interactions… done</div>
+      <div>&gt; build complete — ready to preview<span class="caret"></span></div>
+    </div>
+    <div class="mock-preview">live preview renders here</div>
+  </div>
+</section>
+
+<section class="section-strip">
+  <div class="card strip-item">
+    <div class="eyebrow">01 — Describe</div>
+    <h3>Say what you want</h3>
+    <p>No templates to pick from. Just describe the site or tool in your own words — Forge fills in the rest.</p>
+  </div>
+  <div class="card strip-item">
+    <div class="eyebrow">02 — Build</div>
+    <h3>Watch it assemble</h3>
+    <p>A build log shows structure, styling, and logic coming together in real time, then drops into a live preview.</p>
+  </div>
+  <div class="card strip-item">
+    <div class="eyebrow">03 — Keep it</div>
+    <h3>Save or take it with you</h3>
+    <p>Every build lands in your personal gallery. Download the file whenever you want to host it elsewhere.</p>
+  </div>
+</section>
+
+<section class="auth-wrap" id="auth">
+  <div class="card auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Log in</button>
+      <button class="auth-tab" data-tab="signup">Create account</button>
+    </div>
+
+    <div class="auth-panel active" id="panel-login">
+      <form id="login-form">
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="login-submit">Log in</button>
+        <div class="auth-msg" id="login-msg"></div>
+      </form>
+    </div>
+
+    <div class="auth-panel" id="panel-signup">
+      <form id="signup-form">
+        <div class="field">
+          <label for="signup-name">Name</label>
+          <input type="text" id="signup-name" required autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" required minlength="6" autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="signup-submit">Create account</button>
+        <div class="auth-msg" id="signup-msg"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>Forge — built on Groq &amp; Firebase.</footer>
+
+<script type="module" src="js/auth.js"></script>
+</body>
+</html>

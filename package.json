@@ -1,0 +1,9 @@
+{
+  "name": "forge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Describe an app in plain English, get a live site built by Groq.",
+  "engines": {
+    "node": ">=18"
+  }
+}

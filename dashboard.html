@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Forge — Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  body { background-image: none; }
+
+  .app-shell { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 280px; flex-shrink: 0; border-right: 1px solid var(--line);
+    background: var(--paper-raised); display: flex; flex-direction: column;
+    height: 100vh; position: sticky; top: 0;
+  }
+  .sidebar-head { padding: 1.3rem 1.3rem 1rem; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 0.55rem; font-family: var(--font-display); font-weight: 700; }
+  .brand-mark { width: 24px; height: 24px; border-radius: 6px; background: var(--ink); position: relative; flex-shrink:0; }
+  .brand-mark::after { content: ""; position: absolute; inset: 6px; background: var(--ember); clip-path: polygon(0 100%, 100% 100%, 50% 0); }
+
+  .sidebar-user { padding: 0.9rem 1.3rem; border-bottom: 1px solid var(--line); }
+  .sidebar-user .who { font-size: 0.85rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sidebar-user .email { font-size: 0.75rem; color: var(--muted); font-family: var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 0.7rem;}
+
+  .sidebar-list-head {
+    padding: 1rem 1.3rem 0.4rem; font-size: 0.72rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted); font-family: var(--font-mono);
+  }
+  .app-list { list-style: none; margin: 0; padding: 0 0.7rem; overflow-y: auto; flex: 1; }
+  .app-list-empty { padding: 0.6rem 0.6rem 1rem; font-size: 0.85rem; color: var(--muted); }
+  .app-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+    padding: 0.6rem 0.6rem; border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .app-item:hover { background: var(--paper); }
+  .app-item.active { background: var(--ember-tint); }
+  .app-item .name { font-size: 0.87rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .app-item .del {
+    opacity: 0; border: none; background: transparent; color: var(--muted); font-size: 0.9rem;
+    line-height: 1; padding: 2px 5px;
+  }
+  .app-item:hover .del { opacity: 1; }
+  .app-item .del:hover { color: var(--danger); }
+
+  .sidebar-foot { padding: 1rem 1.3rem; border-top: 1px solid var(--line); }
+
+  .main { flex: 1; min-width: 0; padding: 2rem 2.4rem 3rem; }
+  .main-head { max-width: 980px; margin: 0 auto 1.4rem; }
+  .main-head h1 { font-size: 1.6rem; }
+  .main-head p { color: var(--ink-soft); margin: 0.3rem 0 0; }
+
+  .builder { max-width: 980px; margin: 0 auto; }
+
+  .prompt-card { padding: 1.4rem; margin-bottom: 1.4rem; }
+  .prompt-row { display: flex; gap: 0.8rem; margin-bottom: 1rem; }
+  .prompt-row .field { flex: 1; margin-bottom: 0; }
+  textarea#prompt {
+    min-height: 110px; resize: vertical;
+  }
+  .prompt-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; }
+  .prompt-hint { font-size: 0.8rem; color: var(--muted); }
+
+  .build-log-wrap { display: none; margin-top: 1rem; }
+  .build-log-wrap.active { display: block; }
+  .build-log {
+    font-family: var(--font-mono); font-size: 0.82rem; color: var(--ink-soft);
+    background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 0.9rem 1rem; min-height: 100px;
+  }
+  .build-log div { margin-bottom: 0.35rem; }
+  .build-log .ok { color: var(--ok); }
+  .build-log .err { color: var(--danger); }
+  .caret { display:inline-block; width:7px; height:1em; background:var(--ember); vertical-align:middle; animation: blink 1s step-end infinite; margin-left:2px;}
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .preview-section { display: none; }
+  .preview-section.active { display: block; }
+  .preview-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.6rem; }
+  .preview-head h3 { font-size: 1.05rem; }
+  .preview-actions { display: flex; gap: 0.6rem; }
+
+  .live-link-row {
+    display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.9rem;
+    background: var(--teal-tint); border: 1px solid #bfe3e1; border-radius: var(--radius-sm);
+    padding: 0.6rem 0.7rem;
+  }
+  .live-link-row .eyebrow { flex-shrink: 0; color: var(--teal); }
+  .live-link-row input {
+    flex: 1; min-width: 0; border: none; background: transparent; padding: 0.2rem 0;
+    font-family: var(--font-mono); font-size: 0.82rem; color: var(--ink);
+  }
+  .live-link-row input:focus { box-shadow: none; }
+  .preview-frame-wrap.blueprint-frame { padding: 0; overflow: hidden; }
+  iframe#preview {
+    width: 100%; height: 520px; border: none; display: block; background: #fff;
+    border-radius: var(--radius);
+  }
+
+  .name-inline { max-width: 260px; }
+
+  @media (max-width: 860px) {
+    .app-shell { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; }
+    .app-list { max-height: 220px; }
+    .main { padding: 1.4rem 1.2rem 3rem; }
+    .prompt-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="brand"><span class="brand-mark"></span> Forge</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="who" id="user-name">—</div>
+      <div class="email" id="user-email">—</div>
+      <button class="btn btn-ghost btn-sm btn-block" id="logout-btn">Log out</button>
+    </div>
+    <div class="sidebar-list-head">Your gallery</div>
+    <ul class="app-list" id="app-list">
+      <li class="app-list-empty">Nothing built yet — your first app will show up here.</li>
+    </ul>
+    <div class="sidebar-foot">
+      <button class="btn btn-primary btn-block btn-sm" id="new-app-btn">+ New build</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-head">
+      <h1>What are we building?</h1>
+      <p>Describe the site or tool you want. Forge writes it, previews it live, and you decide whether to keep it.</p>
+    </div>
+
+    <div class="builder">
+      <div class="card prompt-card">
+        <div class="prompt-row">
+          <div class="field name-inline">
+            <label for="app-name">Name this build</label>
+            <input type="text" id="app-name" placeholder="e.g. Habit Tracker" />
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="prompt">Describe the app or website</label>
+          <textarea id="prompt" class="prompt-input" placeholder="A single-page habit tracker with a daily checklist, streak counter, and a clean minimal look in blue and white…"></textarea>
+        </div>
+        <div class="prompt-actions">
+          <span class="prompt-hint">Be specific about layout, features, and tone for best results.</span>
+          <button class="btn btn-primary" id="build-btn">Build it</button>
+        </div>
+
+        <div class="build-log-wrap" id="build-log-wrap">
+          <div class="build-log" id="build-log"></div>
+        </div>
+      </div>
+
+      <section class="preview-section" id="preview-section">
+        <div class="preview-head">
+          <h3>Live preview</h3>
+          <div class="preview-actions">
+            <button class="btn btn-ghost btn-sm" id="download-btn">Download .html</button>
+            <button class="btn btn-teal btn-sm" id="save-btn">Save to gallery</button>
+          </div>
+        </div>
+        <div class="live-link-row" id="live-link-row" style="display:none;">
+          <span class="eyebrow">Live link</span>
+          <input type="text" id="live-link-input" readonly />
+          <button class="btn btn-ghost btn-sm" id="copy-link-btn">Copy</button>
+          <a class="btn btn-primary btn-sm" id="open-link-btn" href="#" target="_blank" rel="noopener">Open</a>
+        </div>
+        <div class="blueprint-frame preview-frame-wrap" data-label="preview">
+          <iframe id="preview" title="Generated app preview" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
